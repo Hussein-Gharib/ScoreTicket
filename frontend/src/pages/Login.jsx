@@ -39,6 +39,8 @@ function Login() {
   return (
     <section className="auth-page">
       <div className="auth-card">
+        <img src="/logo-icon.png" alt="ScoreTicket" className="auth-logo-img" />
+
         <span className="auth-card__badge">Welcome back</span>
         <h1>Login to ScoreTicket</h1>
         <p>Access your tickets and manage your bookings.</p>

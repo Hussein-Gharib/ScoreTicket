@@ -13,9 +13,9 @@ function Navbar() {
 
   return (
     <header className="navbar">
-      <NavLink to="/" className="navbar__logo">
-        ScoreTicket
-      </NavLink>
+    <NavLink to="/" className="navbar__logo">
+        <img src="/logo-full.png" alt="ScoreTicket" className="navbar__logo-img" />
+    </NavLink>
 
       <nav className="navbar__links">
         <NavLink to="/">Home</NavLink>

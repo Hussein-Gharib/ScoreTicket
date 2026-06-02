@@ -1,0 +1,25 @@
+{
+  "name": "scoreticket",
+  "version": "1.0.0",
+  "description": "Full-stack football ticket booking platform",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend -- --open\"",
+    "frontend": "npm run dev --prefix frontend -- --open",
+    "backend": "npm run dev --prefix backend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hussein-Gharib/ScoreTicket.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Hussein-Gharib/ScoreTicket/issues"
+  },
+  "homepage": "https://github.com/Hussein-Gharib/ScoreTicket#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}

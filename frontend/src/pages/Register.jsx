@@ -40,6 +40,8 @@ function Register() {
   return (
     <section className="auth-page">
       <div className="auth-card">
+        <img src="/logo-icon.png" alt="ScoreTicket" className="auth-logo-img" />
+
         <span className="auth-card__badge">Join ScoreTicket</span>
         <h1>Create your account</h1>
         <p>Start booking football tickets in a few clicks.</p>
