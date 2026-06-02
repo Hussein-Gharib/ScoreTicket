@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 function Navbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -22,7 +23,10 @@ function Navbar() {
 
         {token ? (
           <>
+            {user?.role === "admin" && <NavLink to="/admin">Admin</NavLink>}
+
             <NavLink to="/my-tickets">My Tickets</NavLink>
+
             <button className="navbar__logout" onClick={handleLogout}>
               Logout
             </button>
