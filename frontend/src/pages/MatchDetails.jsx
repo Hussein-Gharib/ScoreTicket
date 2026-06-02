@@ -72,7 +72,7 @@ function MatchDetails() {
   };
 
   if (loading) {
-    return <p>Loading tickets...</p>;
+    return <div className="loading-state">Loading tickets</div>;
   }
 
   return (

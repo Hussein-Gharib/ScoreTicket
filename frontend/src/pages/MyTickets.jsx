@@ -44,7 +44,7 @@ function MyTickets() {
   }
 
   if (loading) {
-    return <p>Loading your tickets...</p>;
+    return <div className="loading-state">Loading your tickets</div>;
   }
 
   return (

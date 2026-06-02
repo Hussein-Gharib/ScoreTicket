@@ -22,7 +22,7 @@ function Matches() {
   }, []);
 
   if (loading) {
-    return <p>Loading matches...</p>;
+    return <div className="loading-state">Loading matches</div>;
   }
 
   return (
