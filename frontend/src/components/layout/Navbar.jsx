@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -12,25 +12,25 @@ function Navbar() {
 
   return (
     <header className="navbar">
-      <Link to="/" className="navbar__logo">
+      <NavLink to="/" className="navbar__logo">
         ScoreTicket
-      </Link>
+      </NavLink>
 
       <nav className="navbar__links">
-        <Link to="/">Home</Link>
-        <Link to="/matches">Matches</Link>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/matches">Matches</NavLink>
 
         {token ? (
           <>
-            <Link to="/my-tickets">My Tickets</Link>
+            <NavLink to="/my-tickets">My Tickets</NavLink>
             <button className="navbar__logout" onClick={handleLogout}>
               Logout
             </button>
           </>
         ) : (
           <>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
+            <NavLink to="/login">Login</NavLink>
+            <NavLink to="/register">Register</NavLink>
           </>
         )}
       </nav>
