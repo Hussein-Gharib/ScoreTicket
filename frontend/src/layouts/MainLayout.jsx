@@ -1,9 +1,12 @@
-import "../styles/global.css";
+import Navbar from "../components/layout/Navbar";
+import Footer from "../components/layout/Footer";
 
 function MainLayout({ children }) {
   return (
-    <div className="app-shell">
-      {children}
+    <div className="app">
+      <Navbar />
+      <main className="main-content">{children}</main>
+      <Footer />
     </div>
   );
 }
