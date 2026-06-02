@@ -7,6 +7,7 @@ function Admin() {
 
   const [teams, setTeams] = useState([]);
   const [stadiums, setStadiums] = useState([]);
+  const [matches, setMatches] = useState([]);
 
   const [teamForm, setTeamForm] = useState({
     name: "",
@@ -19,24 +20,43 @@ function Admin() {
     capacity: "",
   });
 
+  const [matchForm, setMatchForm] = useState({
+    home_team_id: "",
+    away_team_id: "",
+    stadium_id: "",
+    league: "",
+    match_date: "",
+  });
+
+  const [ticketCategoryForm, setTicketCategoryForm] = useState({
+    match_id: "",
+    name: "",
+    price: "",
+    total_quantity: "",
+    available_quantity: "",
+  });
+
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchAdminData = async () => {
-      try {
-        const [teamsResponse, stadiumsResponse] = await Promise.all([
+  const fetchAdminData = async () => {
+    try {
+      const [teamsResponse, stadiumsResponse, matchesResponse] =
+        await Promise.all([
           api.get("/teams"),
           api.get("/stadiums"),
+          api.get("/matches"),
         ]);
 
-        setTeams(teamsResponse.data.teams);
-        setStadiums(stadiumsResponse.data.stadiums);
-      } catch (error) {
-        console.log("Failed to fetch admin data:", error);
-      }
-    };
+      setTeams(teamsResponse.data.teams);
+      setStadiums(stadiumsResponse.data.stadiums);
+      setMatches(matchesResponse.data.matches);
+    } catch (error) {
+      console.log("Failed to fetch admin data:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchAdminData();
   }, []);
 
@@ -50,6 +70,20 @@ function Admin() {
   const handleStadiumChange = (event) => {
     setStadiumForm({
       ...stadiumForm,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  const handleMatchChange = (event) => {
+    setMatchForm({
+      ...matchForm,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  const handleTicketCategoryChange = (event) => {
+    setTicketCategoryForm({
+      ...ticketCategoryForm,
       [event.target.name]: event.target.value,
     });
   };
@@ -72,8 +106,7 @@ function Admin() {
         logo_url: "",
       });
 
-      const response = await api.get("/teams");
-      setTeams(response.data.teams);
+      fetchAdminData();
     } catch (error) {
       setError(error.response?.data?.message || "Failed to create team");
     }
@@ -105,10 +138,83 @@ function Admin() {
         capacity: "",
       });
 
-      const response = await api.get("/stadiums");
-      setStadiums(response.data.stadiums);
+      fetchAdminData();
     } catch (error) {
       setError(error.response?.data?.message || "Failed to create stadium");
+    }
+  };
+
+  const handleCreateMatch = async (event) => {
+    event.preventDefault();
+    setMessage("");
+    setError("");
+
+    try {
+      await api.post(
+        "/matches",
+        {
+          home_team_id: Number(matchForm.home_team_id),
+          away_team_id: Number(matchForm.away_team_id),
+          stadium_id: Number(matchForm.stadium_id),
+          league: matchForm.league,
+          match_date: matchForm.match_date,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setMessage("Match created successfully");
+      setMatchForm({
+        home_team_id: "",
+        away_team_id: "",
+        stadium_id: "",
+        league: "",
+        match_date: "",
+      });
+
+      fetchAdminData();
+    } catch (error) {
+      setError(error.response?.data?.message || "Failed to create match");
+    }
+  };
+
+  const handleCreateTicketCategory = async (event) => {
+    event.preventDefault();
+    setMessage("");
+    setError("");
+
+    try {
+      await api.post(
+        "/ticket-categories",
+        {
+          match_id: Number(ticketCategoryForm.match_id),
+          name: ticketCategoryForm.name,
+          price: Number(ticketCategoryForm.price),
+          total_quantity: Number(ticketCategoryForm.total_quantity),
+          available_quantity: Number(ticketCategoryForm.available_quantity),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setMessage("Ticket category created successfully");
+      setTicketCategoryForm({
+        match_id: "",
+        name: "",
+        price: "",
+        total_quantity: "",
+        available_quantity: "",
+      });
+    } catch (error) {
+      setError(
+        error.response?.data?.message || "Failed to create ticket category"
+      );
     }
   };
 
@@ -198,18 +304,155 @@ function Admin() {
         </div>
 
         <div className="admin-card">
-          <h2>Matches</h2>
+          <h2>Add Match</h2>
           <p>Create upcoming football fixtures.</p>
 
-          <div className="admin-preview">
-            <p>Teams loaded: {teams.length}</p>
-            <p>Stadiums loaded: {stadiums.length}</p>
-          </div>
+          <form className="admin-form" onSubmit={handleCreateMatch}>
+            <label>
+              Home Team
+              <select
+                name="home_team_id"
+                value={matchForm.home_team_id}
+                onChange={handleMatchChange}
+              >
+                <option value="">Select home team</option>
+                {teams.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Away Team
+              <select
+                name="away_team_id"
+                value={matchForm.away_team_id}
+                onChange={handleMatchChange}
+              >
+                <option value="">Select away team</option>
+                {teams.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Stadium
+              <select
+                name="stadium_id"
+                value={matchForm.stadium_id}
+                onChange={handleMatchChange}
+              >
+                <option value="">Select stadium</option>
+                {stadiums.map((stadium) => (
+                  <option key={stadium.id} value={stadium.id}>
+                    {stadium.name} - {stadium.city}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              League
+              <input
+                type="text"
+                name="league"
+                placeholder="Premier League"
+                value={matchForm.league}
+                onChange={handleMatchChange}
+              />
+            </label>
+
+            <label>
+              Match Date
+              <input
+                type="datetime-local"
+                name="match_date"
+                value={matchForm.match_date}
+                onChange={handleMatchChange}
+              />
+            </label>
+
+            <Button type="submit">Add Match</Button>
+          </form>
         </div>
 
         <div className="admin-card">
-          <h2>Ticket Categories</h2>
+          <h2>Add Ticket Category</h2>
           <p>Add Standard, Premium, and VIP ticket options.</p>
+
+          <form className="admin-form" onSubmit={handleCreateTicketCategory}>
+            <label>
+              Match
+              <select
+                name="match_id"
+                value={ticketCategoryForm.match_id}
+                onChange={handleTicketCategoryChange}
+              >
+                <option value="">Select match</option>
+                {matches.map((match) => (
+                  <option key={match.id} value={match.id}>
+                    {match.home_team} vs {match.away_team}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Category Name
+              <select
+                name="name"
+                value={ticketCategoryForm.name}
+                onChange={handleTicketCategoryChange}
+              >
+                <option value="">Select category</option>
+                <option value="Standard">Standard</option>
+                <option value="Premium">Premium</option>
+                <option value="VIP">VIP</option>
+                <option value="Away Fans">Away Fans</option>
+                <option value="Family">Family</option>
+              </select>
+            </label>
+
+            <label>
+              Price
+              <input
+                type="number"
+                name="price"
+                placeholder="120"
+                value={ticketCategoryForm.price}
+                onChange={handleTicketCategoryChange}
+              />
+            </label>
+
+            <label>
+              Total Quantity
+              <input
+                type="number"
+                name="total_quantity"
+                placeholder="100"
+                value={ticketCategoryForm.total_quantity}
+                onChange={handleTicketCategoryChange}
+              />
+            </label>
+
+            <label>
+              Available Quantity
+              <input
+                type="number"
+                name="available_quantity"
+                placeholder="100"
+                value={ticketCategoryForm.available_quantity}
+                onChange={handleTicketCategoryChange}
+              />
+            </label>
+
+            <Button type="submit">Add Ticket Category</Button>
+          </form>
         </div>
       </div>
     </section>
