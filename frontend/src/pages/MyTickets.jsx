@@ -34,9 +34,11 @@ function MyTickets() {
   if (!token) {
     return (
       <section className="empty-state">
-        <h1>Please login first</h1>
-        <p>You need an account to view your booked tickets.</p>
-        <Link to="/login">Go to login</Link>
+        <div>
+          <h1>Please login first</h1>
+          <p>You need an account to view your booked tickets.</p>
+          <Link to="/login">Go to login</Link>
+        </div>
       </section>
     );
   }
@@ -52,6 +54,13 @@ function MyTickets() {
         <h1>My Tickets</h1>
         <p>All your booked football tickets in one place.</p>
       </div>
+
+      {tickets.length === 0 && (
+        <div className="empty-card">
+          <h2>No tickets booked yet</h2>
+          <p>Your booked tickets will appear here after your first order.</p>
+        </div>
+      )}
 
       <div className="tickets-grid">
         {tickets.map((ticket) => (

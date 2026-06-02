@@ -75,6 +75,13 @@ function MatchDetails() {
 
       {error && <div className="form-error">{error}</div>}
 
+      {ticketCategories.length === 0 && (
+        <div className="empty-card">
+          <h2>No tickets available</h2>
+          <p>Ticket categories for this match will appear here soon.</p>
+        </div>
+      )}
+
       <div className="ticket-grid">
         {ticketCategories.map((category) => (
           <article className="ticket-card" key={category.id}>

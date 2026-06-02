@@ -33,6 +33,13 @@ function Matches() {
         <p>Browse football matches and book your ticket category.</p>
       </div>
 
+      {matches.length === 0 && (
+        <div className="empty-card">
+          <h2>No matches available</h2>
+          <p>Upcoming matches will appear here soon.</p>
+        </div>
+      )}
+
       <div className="matches-grid">
         {matches.map((match) => (
           <article className="match-card" key={match.id}>

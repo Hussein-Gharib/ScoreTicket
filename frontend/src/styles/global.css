@@ -511,3 +511,21 @@
 .navbar__logout:hover {
   color: var(--color-primary);
 }
+.empty-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.empty-card h2 {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: -0.04em;
+}
+
+.empty-card p {
+  margin: 10px 0 0;
+  color: var(--color-muted);
+}
