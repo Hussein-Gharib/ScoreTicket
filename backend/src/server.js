@@ -6,6 +6,8 @@ const healthRoutes = require("./routes/healthRoutes");
 const authRoutes = require("./routes/authRoutes");
 const teamRoutes = require("./routes/teamRoutes");
 const stadiumRoutes = require("./routes/stadiumRoutes");
+const matchRoutes = require("./routes/matchRoutes");
+const ticketCategoryRoutes = require("./routes/ticketCategoryRoutes");
 const pool = require("./config/db");
 
 const app = express();
@@ -17,6 +19,8 @@ app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/teams", teamRoutes);
 app.use("/api/stadiums", stadiumRoutes);
+app.use("/api/matches", matchRoutes);
+app.use("/api/ticket-categories", ticketCategoryRoutes);
 
 app.get("/", (req, res) => {
   res.json({
