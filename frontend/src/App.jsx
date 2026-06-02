@@ -6,6 +6,7 @@ import MatchDetails from "./pages/MatchDetails";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MyTickets from "./pages/MyTickets";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/my-tickets" element={<MyTickets />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </MainLayout>
   );
