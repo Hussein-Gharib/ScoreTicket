@@ -509,6 +509,34 @@
   overflow-wrap: anywhere;
 }
 
+/* Admin */
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.admin-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 34%),
+    var(--color-surface);
+}
+
+.admin-card h2 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.04em;
+}
+
+.admin-card p {
+  margin: 12px 0 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
 /* States */
 .empty-state {
   min-height: 60vh;
@@ -582,7 +610,8 @@
 /* Responsive */
 @media (max-width: 980px) {
   .matches-grid,
-  .ticket-grid {
+  .ticket-grid,
+  .admin-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -616,59 +645,16 @@
   .auth-card,
   .match-card,
   .ticket-card,
-  .user-ticket {
+  .user-ticket,
+  .admin-card {
     padding: 20px;
   }
 }
 
 @media (max-width: 640px) {
   .matches-grid,
-  .ticket-grid {
+  .ticket-grid,
+  .admin-grid {
     grid-template-columns: 1fr;
   }
 }
-import { NavLink, useNavigate } from "react-router-dom";
-
-function Navbar() {
-  const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
-
-  return (
-    <header className="navbar">
-      <NavLink to="/" className="navbar__logo">
-        ScoreTicket
-      </NavLink>
-
-      <nav className="navbar__links">
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="/matches">Matches</NavLink>
-
-        {token ? (
-          <>
-            {user?.role === "admin" && <NavLink to="/admin">Admin</NavLink>}
-
-            <NavLink to="/my-tickets">My Tickets</NavLink>
-
-            <button className="navbar__logout" onClick={handleLogout}>
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <NavLink to="/login">Login</NavLink>
-            <NavLink to="/register">Register</NavLink>
-          </>
-        )}
-      </nav>
-    </header>
-  );
-}
-
-export default Navbar;
