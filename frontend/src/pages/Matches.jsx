@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 function Matches() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -13,6 +14,7 @@ function Matches() {
         setMatches(response.data.matches);
       } catch (error) {
         console.log("Failed to fetch matches:", error);
+        setError("Failed to load matches. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -23,6 +25,17 @@ function Matches() {
 
   if (loading) {
     return <div className="loading-state">Loading matches</div>;
+  }
+
+  if (error) {
+    return (
+      <section className="empty-state">
+        <div>
+          <h1>Something went wrong</h1>
+          <p>{error}</p>
+        </div>
+      </section>
+    );
   }
 
   return (

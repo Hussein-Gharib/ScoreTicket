@@ -12,6 +12,7 @@ function MatchDetails() {
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [error, setError] = useState("");
+  const [pageError, setPageError] = useState("");
 
   const token = localStorage.getItem("token");
 
@@ -22,6 +23,7 @@ function MatchDetails() {
         setTicketCategories(response.data.ticketCategories);
       } catch (error) {
         console.log("Failed to fetch ticket categories:", error);
+        setPageError("Failed to load tickets. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -73,6 +75,17 @@ function MatchDetails() {
 
   if (loading) {
     return <div className="loading-state">Loading tickets</div>;
+  }
+
+  if (pageError) {
+    return (
+      <section className="empty-state">
+        <div>
+          <h1>Something went wrong</h1>
+          <p>{pageError}</p>
+        </div>
+      </section>
+    );
   }
 
   return (

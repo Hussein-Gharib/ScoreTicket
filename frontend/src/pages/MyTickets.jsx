@@ -5,6 +5,8 @@ import api from "../api/axios";
 function MyTickets() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pageError, setPageError] = useState("");
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -19,6 +21,7 @@ function MyTickets() {
         setTickets(response.data.tickets);
       } catch (error) {
         console.log("Failed to fetch tickets:", error);
+        setPageError("Failed to load your tickets. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -45,6 +48,17 @@ function MyTickets() {
 
   if (loading) {
     return <div className="loading-state">Loading your tickets</div>;
+  }
+
+  if (pageError) {
+    return (
+      <section className="empty-state">
+        <div>
+          <h1>Something went wrong</h1>
+          <p>{pageError}</p>
+        </div>
+      </section>
+    );
   }
 
   return (
