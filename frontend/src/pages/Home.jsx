@@ -1,45 +1,78 @@
-import { Bolt, CalendarDays, Check, Heart, Share2, ShieldCheck, TicketCheck, Users } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { CalendarDays, ChevronRight, Clock3, MapPin, ShieldCheck, Ticket, Trophy, Users } from "lucide-react";
 import { Link } from "react-router-dom";
-import Button from "../components/common/Button";
+import api from "../api/axios";
 
 function Home() {
+  const [matches, setMatches] = useState([]);
+
+  useEffect(() => {
+    api.get("/matches")
+      .then((response) => setMatches(response.data.matches || []))
+      .catch(() => setMatches([]));
+  }, []);
+
+  const featured = matches[0];
+  const upcoming = useMemo(() => matches.slice(0, 4), [matches]);
+
   return (
-    <div className="home-page">
-      <section className="hero">
-        <div className="hero__glow" />
-        <div className="hero__content">
-          <span className="hero__badge"><span /> Official-style football ticketing</span>
-          <h1>Book your seat for the <em>biggest football nights.</em></h1>
-          <p>Browse upcoming matches, choose your ticket category, and manage your bookings in one modern platform.</p>
-          <div className="hero__actions">
-            <Link to="/matches"><Button>Explore Matches</Button></Link>
-            <Link to="/register"><Button variant="outline">Create Account</Button></Link>
-          </div>
-          <div className="hero__trust">
-            <div className="hero__avatars"><span /><span /><span /><b>+2k</b></div>
-            <p>Trusted by <strong>12,000+</strong> football fans across Europe</p>
+    <div className="dashboard-page page-shell">
+      <section className="dashboard-hero">
+        <div>
+          <span className="eyebrow">Live sports marketplace</span>
+          <h1>Football nights.<br />Premium access.</h1>
+          <p>Discover the biggest fixtures, compare ticket categories, and secure your place in the stadium.</p>
+          <div className="hero-actions">
+            <Link className="btn btn--primary" to="/matches">Explore matches <ChevronRight size={18} /></Link>
+            <Link className="btn btn--ghost" to="/register">Create account</Link>
           </div>
         </div>
 
-        <article className="featured-match glass-panel">
-          <div className="featured-match__top"><span className="eyebrow">Featured match</span><div><button><Share2 size={20} /></button><button><Heart size={21} /></button></div></div>
-          <div className="featured-match__teams">
-            <div className="team-crests"><span><ShieldCheck size={21} /></span><span><ShieldCheck size={21} /></span></div>
-            <h2>Barcelona <small>vs</small> Real Madrid</h2>
+        <article className="hero-match glass-card">
+          <div className="hero-match__head"><span>FEATURED MATCH</span><span className="live-dot">ON SALE</span></div>
+          <div className="hero-match__teams">
+            <div className="team-badge">{featured?.home_team_logo ? <img src={featured.home_team_logo} alt="" /> : <ShieldCheck />}</div>
+            <div>
+              <strong>{featured?.home_team || "Barcelona"}</strong>
+              <span>VS</span>
+              <strong>{featured?.away_team || "Real Madrid"}</strong>
+            </div>
+            <div className="team-badge">{featured?.away_team_logo ? <img src={featured.away_team_logo} alt="" /> : <ShieldCheck />}</div>
           </div>
-          <p className="featured-match__meta"><TicketCheck size={16} /> Champions League • Camp Nou</p>
-          <div className="featured-match__details">
-            <div><span>Date</span><strong>Oct 24, 2026</strong></div>
-            <div><span>Time</span><strong>21:00 CET</strong></div>
+          <div className="hero-match__meta">
+            <span><CalendarDays size={16} />{featured ? new Date(featured.match_date).toLocaleDateString() : "24 Oct 2026"}</span>
+            <span><MapPin size={16} />{featured?.stadium_name || "Camp Nou"}</span>
           </div>
-          <div className="featured-match__price"><div><span>Starting from</span><strong>$35</strong></div><Link to="/matches"><Button>Book Now</Button></Link></div>
+          <Link to={featured ? `/matches/${featured.id}` : "/matches"} className="hero-match__cta">View tickets <ChevronRight size={18} /></Link>
         </article>
       </section>
 
-      <section className="benefits-grid">
-        <article className="benefit-card"><TicketCheck /><div><h3>Verified</h3><p>100% Guaranteed Tickets</p></div></article>
-        <article className="benefit-card"><Bolt /><div><h3>Instant</h3><p>Digital Mobile Delivery</p></div></article>
-        <article className="benefit-card benefit-card--wide"><div><span className="eyebrow">Live support</span><h3>Concierge for VIP Travelers</h3><p>Experience hospitality beyond the whistle with our premium travel packages.</p></div><Users /></article>
+      <section className="metric-grid">
+        <article><Ticket /><div><strong>12K+</strong><span>Tickets delivered</span></div></article>
+        <article><Users /><div><strong>8.4K</strong><span>Active supporters</span></div></article>
+        <article><Trophy /><div><strong>18</strong><span>Top competitions</span></div></article>
+        <article><Clock3 /><div><strong>24/7</strong><span>Digital access</span></div></article>
+      </section>
+
+      <section className="dashboard-section">
+        <div className="section-title-row">
+          <div><span className="eyebrow">Match schedule</span><h2>Upcoming fixtures</h2></div>
+          <Link to="/matches">View all <ChevronRight size={17} /></Link>
+        </div>
+
+        <div className="schedule-list">
+          {upcoming.length === 0 ? (
+            <div className="empty-card"><h3>No matches available</h3><p>Add matches from the admin panel to see them here.</p></div>
+          ) : upcoming.map((match) => (
+            <Link to={`/matches/${match.id}`} className="schedule-row" key={match.id}>
+              <div className="schedule-row__date"><strong>{new Date(match.match_date).getDate()}</strong><span>{new Date(match.match_date).toLocaleString("en", { month: "short" })}</span></div>
+              <div className="schedule-row__league">{match.league}</div>
+              <div className="schedule-row__teams"><strong>{match.home_team}</strong><span>vs</span><strong>{match.away_team}</strong></div>
+              <div className="schedule-row__venue"><MapPin size={15} />{match.stadium_name}</div>
+              <ChevronRight size={19} />
+            </Link>
+          ))}
+        </div>
       </section>
     </div>
   );

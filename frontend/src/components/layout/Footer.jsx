@@ -1,28 +1,22 @@
-import { AtSign, Globe2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Code2, Globe2, Mail } from "lucide-react";
 
 function Footer() {
   return (
     <footer className="footer">
-      <div className="footer__grid">
-        <div className="footer__brand">
-          <img src="/logo-full.png" alt="ScoreTicket" className="footer__logo" />
-          <p>Elevating the football match day experience through exclusive access and seamless digital ticketing.</p>
-        </div>
-        <div className="footer__column">
-          <h3>Company</h3>
-          <a href="#about">About Us</a><a href="#partners">Partners</a><a href="#careers">Careers</a>
-        </div>
-        <div className="footer__column">
-          <h3>Support</h3>
-          <a href="#help">Help Center</a><a href="#terms">Terms of Service</a><a href="#privacy">Privacy Policy</a>
-        </div>
-        <div className="footer__column">
-          <h3>Follow us</h3>
-          <div className="footer__socials"><a href="#social" aria-label="Website"><Globe2 size={20} /></a><a href="#contact" aria-label="Contact"><AtSign size={20} /></a></div>
-        </div>
+      <div>
+        <strong>SCORETICKET</strong>
+        <p>Professional football ticketing, built for match day.</p>
       </div>
-      <div className="footer__bottom"><span>© 2026 ScoreTicket. All rights reserved.</span><div><a href="#cookies">Cookie Settings</a><a href="#accessibility">Accessibility</a></div></div>
+      <div className="footer__links">
+        <a href="#privacy">Privacy</a>
+        <a href="#terms">Terms</a>
+        <a href="#support">Support</a>
+      </div>
+      <div className="footer__socials">
+        <a href="#website" aria-label="Website"><Globe2 size={18} /></a>
+        <a href="#email" aria-label="Email"><Mail size={18} /></a>
+        <a href="#github" aria-label="GitHub"><Code2 size={18} /></a>
+      </div>
     </footer>
   );
 }

@@ -9,6 +9,9 @@ import Register from "./pages/Register";
 import MyTickets from "./pages/MyTickets";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
+import Settings from "./pages/Settings";
+import Support from "./pages/Support";
+import Leagues from "./pages/Leagues";
 
 function App() {
   return (
@@ -20,6 +23,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/my-tickets" element={<MyTickets />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="/leagues" element={<Leagues />} />
 
         <Route
           path="/admin"

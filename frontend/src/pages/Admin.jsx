@@ -8,6 +8,7 @@ function Admin() {
   const [teams, setTeams] = useState([]);
   const [stadiums, setStadiums] = useState([]);
   const [matches, setMatches] = useState([]);
+  const [deletingMatchId, setDeletingMatchId] = useState(null);
 
   const [teamForm, setTeamForm] = useState({
     name: "",
@@ -48,11 +49,15 @@ function Admin() {
           api.get("/matches"),
         ]);
 
-      setTeams(teamsResponse.data.teams);
-      setStadiums(stadiumsResponse.data.stadiums);
-      setMatches(matchesResponse.data.matches);
+      setTeams(teamsResponse.data.teams || []);
+      setStadiums(stadiumsResponse.data.stadiums || []);
+      setMatches(matchesResponse.data.matches || []);
     } catch (error) {
       console.log("Failed to fetch admin data:", error);
+
+      setError(
+        error.response?.data?.message || "Failed to load admin information"
+      );
     }
   };
 
@@ -101,12 +106,13 @@ function Admin() {
       });
 
       setMessage("Team created successfully");
+
       setTeamForm({
         name: "",
         logo_url: "",
       });
 
-      fetchAdminData();
+      await fetchAdminData();
     } catch (error) {
       setError(error.response?.data?.message || "Failed to create team");
     }
@@ -132,13 +138,14 @@ function Admin() {
       );
 
       setMessage("Stadium created successfully");
+
       setStadiumForm({
         name: "",
         city: "",
         capacity: "",
       });
 
-      fetchAdminData();
+      await fetchAdminData();
     } catch (error) {
       setError(error.response?.data?.message || "Failed to create stadium");
     }
@@ -167,6 +174,7 @@ function Admin() {
       );
 
       setMessage("Match created successfully");
+
       setMatchForm({
         home_team_id: "",
         away_team_id: "",
@@ -175,7 +183,7 @@ function Admin() {
         match_date: "",
       });
 
-      fetchAdminData();
+      await fetchAdminData();
     } catch (error) {
       setError(error.response?.data?.message || "Failed to create match");
     }
@@ -194,7 +202,9 @@ function Admin() {
           name: ticketCategoryForm.name,
           price: Number(ticketCategoryForm.price),
           total_quantity: Number(ticketCategoryForm.total_quantity),
-          available_quantity: Number(ticketCategoryForm.available_quantity),
+          available_quantity: Number(
+            ticketCategoryForm.available_quantity
+          ),
         },
         {
           headers: {
@@ -204,6 +214,7 @@ function Admin() {
       );
 
       setMessage("Ticket category created successfully");
+
       setTicketCategoryForm({
         match_id: "",
         name: "",
@@ -218,12 +229,74 @@ function Admin() {
     }
   };
 
+  const handleDeleteMatch = async (match) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to remove ${match.home_team} vs ${match.away_team}?\n\nAll ticket categories and booked tickets connected to this match will also be removed.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setMessage("");
+    setError("");
+    setDeletingMatchId(match.id);
+
+    try {
+      const response = await api.delete(`/matches/${match.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setMatches((currentMatches) =>
+        currentMatches.filter(
+          (currentMatch) => currentMatch.id !== match.id
+        )
+      );
+
+      if (
+        Number(ticketCategoryForm.match_id) === Number(match.id)
+      ) {
+        setTicketCategoryForm({
+          match_id: "",
+          name: "",
+          price: "",
+          total_quantity: "",
+          available_quantity: "",
+        });
+      }
+
+      setMessage(
+        response.data.message ||
+          "Match and its related tickets were removed successfully"
+      );
+    } catch (error) {
+      setError(
+        error.response?.data?.message || "Failed to remove match"
+      );
+    } finally {
+      setDeletingMatchId(null);
+    }
+  };
+
+  const formatMatchDate = (date) => {
+    if (!date) {
+      return "No date";
+    }
+
+    return new Date(date).toLocaleString();
+  };
+
   return (
     <section className="admin-page">
       <div className="section-header">
         <span>Admin Panel</span>
         <h1>Manage ScoreTicket</h1>
-        <p>Add teams, stadiums, matches, and ticket categories.</p>
+        <p>
+          Add teams, stadiums, matches, ticket categories, and remove
+          matches.
+        </p>
       </div>
 
       {message && <div className="form-success">{message}</div>}
@@ -243,6 +316,7 @@ function Admin() {
                 placeholder="Chelsea"
                 value={teamForm.name}
                 onChange={handleTeamChange}
+                required
               />
             </label>
 
@@ -265,7 +339,10 @@ function Admin() {
           <h2>Add Stadium</h2>
           <p>Add stadium information and capacity.</p>
 
-          <form className="admin-form" onSubmit={handleCreateStadium}>
+          <form
+            className="admin-form"
+            onSubmit={handleCreateStadium}
+          >
             <label>
               Stadium Name
               <input
@@ -274,6 +351,7 @@ function Admin() {
                 placeholder="Tottenham Hotspur Stadium"
                 value={stadiumForm.name}
                 onChange={handleStadiumChange}
+                required
               />
             </label>
 
@@ -285,6 +363,7 @@ function Admin() {
                 placeholder="London"
                 value={stadiumForm.city}
                 onChange={handleStadiumChange}
+                required
               />
             </label>
 
@@ -296,6 +375,8 @@ function Admin() {
                 placeholder="62850"
                 value={stadiumForm.capacity}
                 onChange={handleStadiumChange}
+                min="1"
+                required
               />
             </label>
 
@@ -314,8 +395,10 @@ function Admin() {
                 name="home_team_id"
                 value={matchForm.home_team_id}
                 onChange={handleMatchChange}
+                required
               >
                 <option value="">Select home team</option>
+
                 {teams.map((team) => (
                   <option key={team.id} value={team.id}>
                     {team.name}
@@ -330,8 +413,10 @@ function Admin() {
                 name="away_team_id"
                 value={matchForm.away_team_id}
                 onChange={handleMatchChange}
+                required
               >
                 <option value="">Select away team</option>
+
                 {teams.map((team) => (
                   <option key={team.id} value={team.id}>
                     {team.name}
@@ -346,8 +431,10 @@ function Admin() {
                 name="stadium_id"
                 value={matchForm.stadium_id}
                 onChange={handleMatchChange}
+                required
               >
                 <option value="">Select stadium</option>
+
                 {stadiums.map((stadium) => (
                   <option key={stadium.id} value={stadium.id}>
                     {stadium.name} - {stadium.city}
@@ -364,6 +451,7 @@ function Admin() {
                 placeholder="Premier League"
                 value={matchForm.league}
                 onChange={handleMatchChange}
+                required
               />
             </label>
 
@@ -374,6 +462,7 @@ function Admin() {
                 name="match_date"
                 value={matchForm.match_date}
                 onChange={handleMatchChange}
+                required
               />
             </label>
 
@@ -385,15 +474,20 @@ function Admin() {
           <h2>Add Ticket Category</h2>
           <p>Add Standard, Premium, and VIP ticket options.</p>
 
-          <form className="admin-form" onSubmit={handleCreateTicketCategory}>
+          <form
+            className="admin-form"
+            onSubmit={handleCreateTicketCategory}
+          >
             <label>
               Match
               <select
                 name="match_id"
                 value={ticketCategoryForm.match_id}
                 onChange={handleTicketCategoryChange}
+                required
               >
                 <option value="">Select match</option>
+
                 {matches.map((match) => (
                   <option key={match.id} value={match.id}>
                     {match.home_team} vs {match.away_team}
@@ -408,6 +502,7 @@ function Admin() {
                 name="name"
                 value={ticketCategoryForm.name}
                 onChange={handleTicketCategoryChange}
+                required
               >
                 <option value="">Select category</option>
                 <option value="Standard">Standard</option>
@@ -426,6 +521,9 @@ function Admin() {
                 placeholder="120"
                 value={ticketCategoryForm.price}
                 onChange={handleTicketCategoryChange}
+                min="0"
+                step="0.01"
+                required
               />
             </label>
 
@@ -437,6 +535,8 @@ function Admin() {
                 placeholder="100"
                 value={ticketCategoryForm.total_quantity}
                 onChange={handleTicketCategoryChange}
+                min="1"
+                required
               />
             </label>
 
@@ -448,12 +548,71 @@ function Admin() {
                 placeholder="100"
                 value={ticketCategoryForm.available_quantity}
                 onChange={handleTicketCategoryChange}
+                min="0"
+                required
               />
             </label>
 
             <Button type="submit">Add Ticket Category</Button>
           </form>
         </div>
+      </div>
+
+      <div className="admin-card admin-matches-manager">
+        <div className="admin-matches-header">
+          <div>
+            <h2>Manage Matches</h2>
+            <p>
+              Remove a match and all ticket information connected to it.
+            </p>
+          </div>
+
+          <span className="admin-match-count">
+            {matches.length} {matches.length === 1 ? "match" : "matches"}
+          </span>
+        </div>
+
+        {matches.length === 0 ? (
+          <div className="admin-empty-state">
+            No matches are currently available.
+          </div>
+        ) : (
+          <div className="admin-match-list">
+            {matches.map((match) => (
+              <div className="admin-match-item" key={match.id}>
+                <div className="admin-match-teams">
+                  <strong>
+                    {match.home_team} vs {match.away_team}
+                  </strong>
+
+                  <span>{match.league}</span>
+                </div>
+
+                <div className="admin-match-information">
+                  <span>
+                    {match.stadium_name}
+                    {match.stadium_city
+                      ? `, ${match.stadium_city}`
+                      : ""}
+                  </span>
+
+                  <span>{formatMatchDate(match.match_date)}</span>
+                </div>
+
+                <button
+                  className="admin-delete-match-button"
+                  type="button"
+                  onClick={() => handleDeleteMatch(match)}
+                  disabled={deletingMatchId === match.id}
+                >
+                  {deletingMatchId === match.id
+                    ? "Removing..."
+                    : "Remove Match"}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
